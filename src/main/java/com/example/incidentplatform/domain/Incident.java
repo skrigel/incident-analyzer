@@ -7,10 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -40,6 +38,10 @@ public class Incident {
 
     private List<Alert> alerts;
 
+    @ManyToOne
+    @JoinColumn(name = "assigned_to_id")
+    private User assignedTo;
+
     @CreationTimestamp
     private Instant createdAt;
 
@@ -56,7 +58,9 @@ public class Incident {
     }
 
 
-//    public Collection<Object> getAlerts() {
-//    }
+    public Collection<Object> getAlerts() {
+        return new ArrayList<>(this.alerts);
+    }
+
 }
 

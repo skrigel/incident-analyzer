@@ -16,12 +16,22 @@ public interface IncidentRepository
     Optional<Incident> findFirstBySourceAndStatus(
             String source, IncidentStatus status);
 
+
     List<Incident> findByStatus(IncidentStatus status);
 
     List<Incident> findBySeverityAndStatus(
             Severity severity, IncidentStatus status);
 
+    // Fetches assignedTo in the same JOIN so UserSummary mapping
+    @Query("""
 
+            SELECT i FROM Incident i
+            LEFT JOIN FETCH i.assignedTo
+            WHERE i.id = :id
+        """)
+    Optional<Incident> findByIdWithAssignee(@Param("id") UUID id);
+
+    // Finds the most recent open incident from the same source
     @Query("""
          SELECT i FROM Incident i
         WHERE i.status = 'RESOLVED'
