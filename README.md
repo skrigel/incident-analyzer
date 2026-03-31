@@ -56,6 +56,26 @@ mvn spring-boot:run
 open http://localhost:8080/swagger-ui.html
 ```
 
+### Testing
+```aiignore
+# Start PostgreSQL
+  docker-compose up -d
+
+  # Run the application
+  ./mvnw spring-boot:run
+
+  # Test user endpoints
+  curl -X POST http://localhost:8080/api/v1/users \
+    -H "Content-Type: application/json" \
+    -d '{"name":"John Doe","email":"john@example.com"}'
+
+  curl http://localhost:8080/api/v1/users/{id}
+
+  # View API docs
+  open http://localhost:8080/swagger-ui.html
+
+```
+
 ## API Endpoints
 
 ### Incidents
