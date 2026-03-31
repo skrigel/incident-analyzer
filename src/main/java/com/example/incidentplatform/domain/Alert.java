@@ -18,8 +18,8 @@ public class Alert {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
-    private UUID incident;
+    @ManyToOne
+    private Incident incident;
 
     @Column
     private String source;

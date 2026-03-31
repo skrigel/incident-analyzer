@@ -36,6 +36,7 @@ public class Incident {
 
     private Set<String> tags;
 
+    @OneToMany
     private List<Alert> alerts;
 
     @ManyToOne
