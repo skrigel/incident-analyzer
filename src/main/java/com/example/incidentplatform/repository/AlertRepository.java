@@ -11,18 +11,17 @@ public interface AlertRepository
         extends JpaRepository<Alert, UUID> {
 
 
+    // Ordered by firedAt DESC so most recent alert is first.
     @Query("""
         SELECT a FROM Alert a
-        WHERE a.id==:id
+        WHERE a.incident.id==:id
+                ORDER BY a.firedAt DESC
         """)
-    Optional<Alert> findById(
-            @Param("incidentId") UUID id);
-    // Ordered by firedAt DESC so most recent alert is first.
     List<Alert> findByIncidentIdOrderByFiredAtDesc(UUID incidentId);
 
     @Query("""
         SELECT a FROM Alert a
-        WHERE a.incident==:incidentId
+        WHERE a.incident.id==:id
         """)
     List<Alert> findByIncidentId(
             @Param("incidentId") UUID incidentId);
@@ -47,6 +46,6 @@ public interface AlertRepository
             @Param("since")  Instant since);
 
     @Modifying
-    @Query("DELETE FROM Alert a WHERE a.incident= :incidentId")
+    @Query("DELETE FROM Alert a WHERE a.incident.id = :incidentId")
     void deleteByIncidentId(@Param("incidentId") UUID incidentId);
 }
