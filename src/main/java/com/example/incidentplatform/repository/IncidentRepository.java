@@ -14,7 +14,7 @@ public interface IncidentRepository
         extends JpaRepository<Incident, UUID> {
 
     Optional<Incident> findFirstBySourceAndStatus(
-            String source, IncidentStatus status);
+             String source, IncidentStatus status);
 
 
     List<Incident> findByStatus(IncidentStatus status);

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,6 +34,12 @@ public class UserService {
             .orElseThrow(() -> new NotFoundException("User", id));
 
         return UserResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsers() {
+        return userRepo.findAll().stream().map(UserResponse::from).toList();
+
     }
 
 

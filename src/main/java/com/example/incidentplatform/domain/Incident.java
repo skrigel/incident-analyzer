@@ -32,6 +32,9 @@ public class Incident {
     @Enumerated(EnumType.STRING)
     private IncidentStatus status=IncidentStatus.OPEN;
 
+    @Column(nullable=false)
+    private String source;
+
     private String summary;
 
     private Set<String> tags;

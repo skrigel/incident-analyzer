@@ -14,7 +14,4 @@ public interface UserRepository
 
     Optional<User> findByEmail(String email);
 
-    // Finds who is on-call for a given severity level.
-    Optional<User> findFirstByOnCallSeverity(Severity severity);
-
 }
