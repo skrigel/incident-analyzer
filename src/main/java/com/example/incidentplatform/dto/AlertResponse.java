@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record AlertResponse(
         UUID id,
-        Incident incident,
+        UUID incidentId,
         String source,
         String message,
         Severity severity,
@@ -19,7 +19,7 @@ public record AlertResponse(
     public static AlertResponse from(Alert a) {
         return new AlertResponse(
                 a.getId(),
-                a.getIncident(),
+                a.getIncident().getId(),
                 a.getSource(),
                 a.getMessage(),
                 a.getSeverity(),

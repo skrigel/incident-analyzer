@@ -14,14 +14,14 @@ public interface AlertRepository
     // Ordered by firedAt DESC so most recent alert is first.
     @Query("""
         SELECT a FROM Alert a
-        WHERE a.incident.id==:id
-                ORDER BY a.firedAt DESC
+        WHERE a.incident.id = :id
+        ORDER BY a.firedAt DESC
         """)
-    List<Alert> findByIncidentIdOrderByFiredAtDesc(UUID incidentId);
+    List<Alert> findByIncidentIdOrderByFiredAtDesc(@Param("id") UUID incidentId);
 
     @Query("""
         SELECT a FROM Alert a
-        WHERE a.incident.id==:id
+        WHERE a.incident.id = :incidentId
         """)
     List<Alert> findByIncidentId(
             @Param("incidentId") UUID incidentId);

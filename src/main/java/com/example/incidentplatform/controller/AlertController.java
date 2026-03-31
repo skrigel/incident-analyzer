@@ -12,21 +12,16 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 @RestController
-@RequestMapping("/api/v1/incidents")
+@RequestMapping("/api/v1/alerts")
 @RequiredArgsConstructor
 @Validated
 public class AlertController {
 
     private final AlertService service;
-    private final IncidentService incidentService;
 
-    @GetMapping("/{id}")
-    public AlertResponse getAlert(@PathVariable UUID id) {
-        return service.getById(id);
-    }
-
-    @PostMapping("/ingest")
-    public AlertResponse ingestAlerts(@Valid @RequestBody AlertRequest req) {
+    @PostMapping
+    @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
+    public AlertResponse ingestAlert(@Valid @RequestBody AlertRequest req) {
         return service.ingest(req);
     }
 }
