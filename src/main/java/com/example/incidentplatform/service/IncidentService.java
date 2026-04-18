@@ -5,6 +5,8 @@ import com.example.incidentplatform.domain.Incident;
 import com.example.incidentplatform.domain.IncidentStatus;
 import com.example.incidentplatform.domain.User;
 import com.example.incidentplatform.dto.*;
+import com.example.incidentplatform.event.IncidentEventPublisher;
+import com.example.incidentplatform.event.models.IncidentCreatedEvent;
 import com.example.incidentplatform.exception.NotFoundException;
 import com.example.incidentplatform.repository.AlertRepository;
 import com.example.incidentplatform.repository.IncidentRepository;
@@ -41,7 +43,7 @@ public class IncidentService {
 //        this.alertRepo = alertRepo;
 //        this.userRepo = userRepo;
 //    }
-//    private final IncidentEventPublisher publisher;   // added Stage 3
+    private final IncidentEventPublisher publisher;   // added Stage 3
 
     @Transactional
     @CacheEvict(value = "incident-lists", allEntries = true)
@@ -52,6 +54,17 @@ public class IncidentService {
         incident.setStatus(IncidentStatus.OPEN);
 
         Incident saved = incidentRepo.save(incident);
+
+        // Publish Spring event (forwarded to Kafka)
+        publisher.onIncidentCreated(
+                new IncidentCreatedEvent(
+                        saved.getId(),
+                        saved.getSeverity(),
+                        saved.getCreatedAt(),
+                        "api"
+                )
+        );
+
         return IncidentResponse.from(saved);
     }
 

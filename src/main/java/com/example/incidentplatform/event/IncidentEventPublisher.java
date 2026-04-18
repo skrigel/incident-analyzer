@@ -1,6 +1,8 @@
 package com.example.incidentplatform.event;
 
+import com.example.incidentplatform.event.models.IncidentCreatedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,4 +20,5 @@ public class IncidentEventPublisher {
                 event
         );
     }
+
 }

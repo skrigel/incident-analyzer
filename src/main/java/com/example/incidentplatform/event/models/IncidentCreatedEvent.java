@@ -7,5 +7,6 @@ import java.util.UUID;
 
 public record IncidentCreatedEvent(UUID incidentId,
                                    Severity severity,
-                                   Instant createdAt) {
+                                   Instant createdAt,
+                                   String source) {
 }
