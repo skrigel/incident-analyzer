@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public record AlertRequest(
-        @NotBlank  UUID id,
+        @NotBlank  String requestId,
         @NotBlank String source,
         @NotBlank String message,
         @NotNull Severity severity,
