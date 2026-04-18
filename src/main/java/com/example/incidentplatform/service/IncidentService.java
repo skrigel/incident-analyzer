@@ -13,6 +13,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.annotation.ReadOnlyProperty;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +44,7 @@ public class IncidentService {
 //    private final IncidentEventPublisher publisher;   // added Stage 3
 
     @Transactional
+    @CacheEvict(value = "incident-lists", allEntries = true)
     public IncidentResponse create(CreateIncidentRequest req) {
         Incident incident = new Incident();
         incident.setTitle(req.title());
@@ -51,10 +55,10 @@ public class IncidentService {
         return IncidentResponse.from(saved);
     }
 
-
-
+    // Only cache when alerts are NOT included (they change too frequently)
     @Transactional
     @ReadOnlyProperty
+    @Cacheable(value = "incidents", key = "#id", condition = "!#includeAlerts")
     public IncidentResponse getById(UUID id, boolean includeAlerts) {
         Incident incident = findOrThrow(id);
         if (includeAlerts) {
@@ -67,6 +71,10 @@ public class IncidentService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "incidents", key = "#id"),
+            @CacheEvict(value = "incident-lists", allEntries = true)
+    })
     public IncidentResponse updateStatus(UUID id, UpdateStatusRequest req) {
         Incident incident = findOrThrow(id);
 //        validateTransition(incident.getStatus(), req.status());
@@ -79,6 +87,10 @@ public class IncidentService {
     }
 
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "incidents", key = "#id"),
+            @CacheEvict(value = "incident-lists", allEntries = true)
+    })
     public IncidentResponse assign(UUID id, AssignRequest req) {
         Incident incident = findOrThrow(id);
         User user = userRepo.findById(req.userId())

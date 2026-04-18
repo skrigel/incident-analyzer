@@ -39,10 +39,17 @@ public class CacheConfig  {
         // Per-cache configuration
         Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
 
-        // Users cache - 30 minutes TTL
+        // incidents cache - 60s TTL
+        // incidents change a lot (status updates, assignments, etc)
+        cacheConfigs.put("incidents", defaultConfig.entryTtl(Duration.ofSeconds(60)));
+
+        cacheConfigs.put("incident-lists", defaultConfig.entryTtl(Duration.ofSeconds(30)));
+
         cacheConfigs.put("users", defaultConfig.entryTtl(Duration.ofMinutes(30)));
 
+        cacheConfigs.put("user-lists", defaultConfig.entryTtl(Duration.ofMinutes(10)));
         // Session cache - 1 hour TTL
+        // TODO: set up sessions
         cacheConfigs.put("sessions", defaultConfig.entryTtl(Duration.ofHours(1)));
 
         // Short-lived cache - 1 minute TTL

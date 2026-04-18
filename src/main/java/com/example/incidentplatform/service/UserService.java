@@ -6,6 +6,8 @@ import com.example.incidentplatform.dto.*;
 import com.example.incidentplatform.exception.NotFoundException;
 import com.example.incidentplatform.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +21,7 @@ public class UserService {
     private final UserRepository userRepo;
 
     @Transactional
+    @CacheEvict(value = "user-lists", allEntries = true)
     public UserResponse create(CreateUserRequest req) {
         User user = new User();
         user.setName(req.name());
@@ -29,6 +32,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "users", key= "#id")
     public UserResponse getUser(UUID id) {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new NotFoundException("User", id));
@@ -37,9 +41,9 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "user-lists")
     public List<UserResponse> getUsers() {
         return userRepo.findAll().stream().map(UserResponse::from).toList();
-
     }
 
 
