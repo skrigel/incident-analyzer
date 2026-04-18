@@ -6,6 +6,7 @@ import com.example.incidentplatform.domain.IncidentStatus;
 import com.example.incidentplatform.dto.AlertRequest;
 import com.example.incidentplatform.dto.AlertResponse;
 import com.example.incidentplatform.repository.AlertRepository;
+import com.example.incidentplatform.repository.IdempotencyRepository;
 import com.example.incidentplatform.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,10 +22,25 @@ public class AlertService {
 
     private final AlertRepository alertRepo;
     private final IncidentRepository incidentRepo;
+    private final IdempotencyRepository idemRepo;
 //    private final IncidentEventPublisher publisher;  // Stage 3
 
     @Transactional
     public AlertResponse ingest(AlertRequest req) {
+        // Build idempotency key (entity:operation:id pattern)
+        String key = IdempotencyRepository.buildKey("alert", "ingest", req.requestId());
+
+        // Check if already processed
+        String cachedAlertId = idemRepo.get(key);
+        if (cachedAlertId != null) {
+            UUID alertId = UUID.fromString(cachedAlertId);
+            Alert alert = alertRepo.findById(alertId)
+                    .orElseThrow(() -> new IllegalStateException(
+                            "Cached alert not found: " + alertId));
+            return AlertResponse.from(alert);
+        }
+
+        // First time - create alert/incident
         Incident incident = incidentRepo
                 .findFirstBySourceAndStatus(req.source(), IncidentStatus.OPEN)
                 .orElseGet(() -> createIncidentForAlert(req));
@@ -37,6 +53,9 @@ public class AlertService {
         alert.setFiredAt(req.firedAt() != null ? req.firedAt() : Instant.now());
 
         Alert saved = alertRepo.save(alert);
+
+        // Store alert ID for future duplicate detection
+        idemRepo.setIfAbsent(key, saved.getId().toString());
 
         return AlertResponse.from(saved);
     }
